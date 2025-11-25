@@ -19,10 +19,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Data files (keeping your CSV data untracked)
-*.csv
-Data/
-
 # Output files
 *.mat
 *.fig
