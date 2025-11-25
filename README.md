@@ -95,7 +95,7 @@ barPlotWithPoints(longTbl, 'Task', 'Group', 'Normalized Frequency', 'Simple task
 The `buildLongTable` functions support multiple normalization types (specified as first parameter):
 - **Type 1**: Raw values
 - **Type 2**: Z-score normalization
-- **Type 3**: Percent change (recommended for most analyses)
+- **Type 3**: min-max normalization
 
 ## Statistical Approach
 
@@ -113,13 +113,6 @@ The `buildLongTable` functions support multiple normalization types (specified a
 - Data files in `Data/` directory are excluded from version control
 - Output figures and MAT files are also gitignored
 - All analyses use unequal variance corrections where appropriate (Welch's t-test)
-
-## Analysis Dates
-
-- Long Evans initial analysis: 11/02/2025
-- Food consumption analysis: 11/05/2025
-- 2xOPRM1 DREADD experiments: 11/05/2025
-
 ---
 
 *For questions or issues, refer to commented sections in `runme.m` for specific analysis workflows.*
