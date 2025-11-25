@@ -110,8 +110,6 @@ The `buildLongTable` functions support multiple normalization types (specified a
 
 ## Notes
 
-- Data files in `Data/` directory are excluded from version control
-- Output figures and MAT files are also gitignored
 - All analyses use unequal variance corrections where appropriate (Welch's t-test)
 ---
 
