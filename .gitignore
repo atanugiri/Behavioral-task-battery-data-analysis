@@ -1,0 +1,38 @@
+# MATLAB
+*.asv
+*.m~
+*.mex*
+*.autosave
+slprj/
+*.slxc
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Data files (keeping your CSV data untracked)
+*.csv
+Data/
+
+# Output files
+*.mat
+*.fig
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.eps
+
+# Temporary files
+*~
+*.swp
+*.swo
