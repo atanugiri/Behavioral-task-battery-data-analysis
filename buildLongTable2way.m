@@ -1,12 +1,13 @@
-function longTbl = buildLongTable2way(normType, saveToExcel, fileName, varargin)
+function longTbl = buildLongTable2way(normType, saveToExcel, fileName, sheetName, varargin)
 % buildLongTable2way
 % Returns a long-format table for 2-way ANOVA across tasks:
 %   Variables: Y, Group={Saline,Ghrelin}, Task={file1,file2,...}
 %
 % Inputs:
 %   normType    : 1=raw (default), 2=z-score vs col1 (Saline, per file), 3=min-max (per file)
-%   saveToExcel : true/false (default false) → writes 'long_data_2way' sheet
+%   saveToExcel : true/false (default false) → writes to Excel
 %   fileName    : base name for Excel (ignored if saveToExcel=false)
+%   sheetName   : name of the sheet to write (default 'long_data_2way')
 %   varargin    : one or more CSV/XLSX files; each file has 2 columns:
 %                 [Saline, Ghrelin]
 %
@@ -24,7 +25,8 @@ function longTbl = buildLongTable2way(normType, saveToExcel, fileName, varargin)
 if nargin < 1 || isempty(normType),    normType = 1; end
 if nargin < 2 || isempty(saveToExcel), saveToExcel = false; end
 if nargin < 3, fileName = ''; end
-assert(nargin >= 4, 'Provide at least one file after (normType, saveToExcel, fileName).');
+if nargin < 4 || isempty(sheetName), sheetName = 'long_data_2way'; end
+assert(nargin >= 5, 'Provide at least one file after (normType, saveToExcel, fileName, sheetName).');
 
 grpLabels = {'Saline','Ghrelin'};
 
@@ -72,8 +74,8 @@ Task  = categorical(T, unique(T,'stable'));  % keep file order
 longTbl = table(Y, Group, Task);
 
 if saveToExcel
-    if isempty(fileName), fileName = 'twoWayAnova_long'; end
-    writetable(longTbl, [fileName '.xlsx'], 'Sheet','long_data_2way');
+    if isempty(fileName), fileName = 'ANOVA_Data_Deposition'; end
+    writetable(longTbl, [fileName '.xlsx'], 'Sheet', sheetName, 'WriteMode', 'append');
 end
 end
 

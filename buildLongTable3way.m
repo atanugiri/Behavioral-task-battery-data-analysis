@@ -1,23 +1,34 @@
-function longTbl = buildLongTable3way(normType, saveToExcel, fileName, varargin)
+function longTbl = buildLongTable3way(normType, saveToExcel, fileName, sheetName, varargin)
 % buildLongTable3way
 % Returns a long-format table for 3-way ANOVA:
-%   Y, Group={Saline,Ghrelin}, Dreadds={WT,Inhibitory,Excitatory}, Task
+%   Y, Group={Saline,Ghrelin}, Dreadds={WT,Inhibitory,Excitatory}, Task={Task1,Task2,...}
 %
 % Inputs:
 %   normType    : 1=raw (default), 2=z-score vs col1, 3=min-max (per task)
-%   saveToExcel : true/false (default false) → writes 'long_data' sheet
+%   saveToExcel : true/false (default false) → writes to Excel
 %   fileName    : base name for Excel (ignored if saveToExcel=false)
+%   sheetName   : name of the sheet to write (default 'long_data')
 %   varargin    : one or more CSV/XLSX files; each file = one Task
 %
 % Each file must have ≥6 columns in this order:
 %   [Saline-WT, Ghrelin-WT, Saline-Inhib, Ghrelin-Inhib, Saline-Excit, Ghrelin-Excit]
+%
+% Usage:
+%   % Full 3-way ANOVA (Group × Dreadds × Task):
+%   [p, tbl, stats] = anovan(longTbl.Y, {longTbl.Group, longTbl.Dreadds, longTbl.Task}, ...
+%       'model', 'interaction', 'varnames', {'Group','Dreadds','Task'});
+%
+%   % 2-way ANOVA (Group × Dreadds, collapsing across Task):
+%   [p, tbl, stats] = anovan(longTbl.Y, {longTbl.Group, longTbl.Dreadds}, ...
+%       'model', 'interaction', 'varnames', {'Group','Dreadds'});
 
 if nargin < 1 || isempty(normType),    normType = 1; end
 if nargin < 2 || isempty(saveToExcel), saveToExcel = false; end
 if nargin < 3, fileName = ''; end
-assert(nargin >= 4, 'Provide at least one file after (normType, saveToExcel, fileName).');
+if nargin < 4 || isempty(sheetName), sheetName = 'long_data'; end
+assert(nargin >= 5, 'Provide at least one file after (normType, saveToExcel, fileName, sheetName).');
 
-grpLabels = {'Saline','Ghrelin'};                % (Ghrelin = your 2× IBU)
+grpLabels = {'Saline','Ghrelin'};                % (Ghrelin = 2× IBU)
 dreLabels = {'WT','Inhibitory','Excitatory'};
 col2fact  = [1 1; 2 1; 1 2; 2 2; 1 3; 2 3];       % [Group Dreadds] per column
 
@@ -34,7 +45,7 @@ for fi = 1:numel(varargin)
 
     for c = 1:6
         y = Xn(:,c);
-        y = y(isfinite(y));           % drop NaNs/Inf (your preference)
+        y = y(isfinite(y));           % drop NaNs/Inf
         if isempty(y), continue; end
         gLevel = col2fact(c,1);
         dLevel = col2fact(c,2);
@@ -51,8 +62,8 @@ Task    = categorical(T, unique(T,'stable'), 'Ordinal', true);  % Task1..k in fi
 longTbl = table(Y, Group, Dreadds, Task);
 
 if saveToExcel
-    if isempty(fileName), fileName = 'threeWayAnova_long'; end
-    writetable(longTbl, [fileName '.xlsx'], 'Sheet','long_data');
+    if isempty(fileName), fileName = 'ANOVA_Data_Deposition'; end
+    writetable(longTbl, [fileName '.xlsx'], 'Sheet', sheetName, 'WriteMode', 'append');
 end
 end
 
