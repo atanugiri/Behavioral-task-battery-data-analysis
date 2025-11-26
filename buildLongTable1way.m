@@ -1,4 +1,4 @@
-function longTbl = buildLongTable1way(normType, saveToExcel, fileName, varargin)
+function longTbl = buildLongTable1way(normType, saveToExcel, fileName, sheetName, varargin)
 % buildLongTable1way
 % Pool k files; each file has 6 columns in this fixed order:
 %   [Saline-WT, Ghrelin-WT, Saline-Inhib, Ghrelin-Inhib, Saline-Excit, Ghrelin-Excit]
@@ -9,8 +9,9 @@ function longTbl = buildLongTable1way(normType, saveToExcel, fileName, varargin)
 %   normType    : 1 = raw (default)
 %                 2 = z-score vs column 1 (Saline-WT) within each file
 %                 3 = min-max across all 6 columns within each file
-%   saveToExcel : true/false (default false) → writes 'long_data' sheet
+%   saveToExcel : true/false (default false) → writes to Excel
 %   fileName    : base name for Excel (ignored if saveToExcel=false)
+%   sheetName   : name of the sheet to write (default 'long_data_1way')
 %   varargin    : one or more file paths; each file contributes 6 columns
 %
 % Output:
@@ -19,7 +20,8 @@ function longTbl = buildLongTable1way(normType, saveToExcel, fileName, varargin)
 if nargin < 1 || isempty(normType),    normType = 1; end
 if nargin < 2 || isempty(saveToExcel), saveToExcel = false; end
 if nargin < 3, fileName = ''; end
-assert(nargin >= 4, 'Provide at least one file after (normType, saveToExcel, fileName).');
+if nargin < 4 || isempty(sheetName), sheetName = 'long_data_1way'; end
+assert(nargin >= 5, 'Provide at least one file after (normType, saveToExcel, fileName, sheetName).');
 
 condLabels = {'Saline-WT','Ghrelin-WT', ...
               'Saline-Inhib','Ghrelin-Inhib', ...
@@ -57,8 +59,8 @@ Condition = categorical(C, condLabels);   % fixed, stable order
 longTbl   = table(Y, Condition);
 
 if saveToExcel
-    if isempty(fileName), fileName = 'oneWay6_long'; end
-    writetable(longTbl, [fileName '.xlsx'], 'Sheet','long_data');
+    if isempty(fileName), fileName = 'ANOVA_Data_Deposition'; end
+    writetable(longTbl, [fileName '.xlsx'], 'Sheet', sheetName, 'WriteMode', 'append');
 end
 end
 
