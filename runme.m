@@ -64,42 +64,31 @@ barPlotWithPoints(longTbl, 'Dreadds', 'Group', 'Normalized Frequency', 'Complex 
     'model','interaction', 'varnames', {'Group','Dreadds'});
 [c, m, h, gnames] = multcompare(stats, "Dimension", [1 2]);
 
-% % Non-parametric tests
-% ix = string(longTbl.Task)=="Task1" & string(longTbl.Dreadds)=="WT";
-% x  = longTbl.Y(ix & longTbl.Group=="Saline");
-% y  = longTbl.Y(ix & longTbl.Group=="Ghrelin");
-% wilcoxon_rs_results(x, y);
+% t-test summary: 2xOPRM1 Rats simple and complex tasks [11/05/2025]
+longTbl = buildLongTable3way(1, false, '', '', 'Data/2xOPRM1/FA_Controls.csv', ...
+'Data/2xOPRM1/TA_Controls.csv', 'Data/2xOPRM1/LA_Controls.csv');
 
-% % 2-way ANOVA for 2xOPRM1 Rats [10/17/2025]
-% [p, tbl, stats] = anovan(longTbl.Y,{longTbl.Group, longTbl.Dreadds}, ...
-%     'model','interaction', 'varnames',{'Group','Dreadds'});
+task = ["Task1", "Task2", "Task3"];
 
-% [c, m, h, gnames] = multcompare(stats, 'Dimension', [1 2]);
+dreadds1 = [repmat("WT", 1, 5)];
+dreadds2 = ["WT", "Inhibitory", "Inhibitory", "Excitatory", "Excitatory"];
 
+treatment1 = ["Saline", "Saline", "Ghrelin", "Saline", "Ghrelin"];
+treatment2 = [repmat("Ghrelin", 1, 3), repmat("Saline", 1, 2)];
 
-% % t-test summary: 2xOPRM1 Rats simple and complex tasks [10/29/2025]
-% longTbl = buildLongTable3way(1, false, '', 'Data/2xOPRM1/FA_Controls.csv');
-% longTbl = buildLongTable3way(1, false, '', 'Data/2xOPRM1/TA_Controls.csv');
-% longTbl = buildLongTable3way(1, false, '', 'Data/2xOPRM1/LA_Controls.csv');
+for t = 1:length(task)
+    fprintf("\n=== %s ===\n", task(t));
 
-% longTbl = buildLongTable3way(1, false, '', 'Data/2xOPRM1/FL_Controls.csv');
-% longTbl = buildLongTable3way(1, false, '', 'Data/2xOPRM1/TL_Controls.csv');
+    for d = 1:numel(dreadds1)
+        ix = string(longTbl.Dreadds)==dreadds1(d) & string(longTbl.Group)==treatment1(d) & string(longTbl.Task)==task(t);
+        iy = string(longTbl.Dreadds)==dreadds2(d) & string(longTbl.Group)==treatment2(d) & string(longTbl.Task)==task(t);
+        
+        x  = longTbl.Y(ix);
+        y  = longTbl.Y(iy);
+        [~, p, ~, stats] = ttest2(x, y, 'Vartype', 'unequal');
 
-% dreadds1 = [repmat("WT", 1, 5)];
-% dreadds2 = ["WT", "Inhibitory", "Inhibitory", "Excitatory", "Excitatory"];
-
-% treatment1 = ["Saline", "Saline", "Ghrelin", "Saline", "Ghrelin"];
-% treatment2 = [repmat("Ghrelin", 1, 3), repmat("Saline", 1, 2),];
-
-% for d = 1:numel(dreadds1)
-%     ix = string(longTbl.Dreadds)==dreadds1(d) & string(longTbl.Group)==treatment1(d);
-%     iy = string(longTbl.Dreadds)==dreadds2(d) & string(longTbl.Group)==treatment2(d);
-    
-%     x  = longTbl.Y(ix);
-%     y  = longTbl.Y(iy);
-%     [~, p, ~, stats] = ttest2(x, y, 'Vartype', 'unequal');
-
-%     fprintf("%s-%s vs %s-%s: t(%0.2f) = %.2f, p = %.3f\n", ...
-%         dreadds1(d), treatment1(d), dreadds2(d), treatment2(d), ...
-%         stats.df, stats.tstat, p);
-% end
+        fprintf("%s-%s vs %s-%s: t(%0.2f) = %.2f, p = %.3f\n", ...
+            dreadds1(d), treatment1(d), dreadds2(d), treatment2(d), ...
+            stats.df, stats.tstat, p);
+    end
+end
